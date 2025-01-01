@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Particle Constellation with Rotating Cube Particles</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: black;  // Ensures the background is black
+        }
+        #container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        var scene, camera, renderer, controls, cubeParticles;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 50;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('container').appendChild(renderer.domElement);
+
+            // Adjusted OrbitControls to the correct path and initialization
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            controls.enableZoom = true;
+
+            cubeParticles = createCubeParticles();
+            scene.add(cubeParticles);
+
+            window.addEventListener('resize', onWindowResize, false);
+
+            animate();
+        }
+
+        function createCubeParticles() {
+            var geometry = new THREE.BoxGeometry(2, 2, 2);
+            var material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+
+            var count = 4500;
+            var cubeParticles = new THREE.Group();
+
+            for (var i = 0; i < count; i++) {
+                var cube = new THREE.Mesh(geometry, material);
+                cube.position.set((Math.random() * 100) - 50, (Math.random() * 100) - 50, (Math.random() * 100) - 50);
+                cubeParticles.add(cube);
+            }
+
+            return cubeParticles;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            cubeParticles.rotation.x += 0.01;
+            cubeParticles.rotation.y += 0.01;
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        init();
+    </script>
+</body>
+</html>
